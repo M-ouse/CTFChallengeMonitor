@@ -17,7 +17,7 @@ int main() {
 
     fprintf(stdout,"Start Monitoring...\n");
     Delay(1);
-    for(int i=0;i<5;i++) {
+    while(true) {
         NetworkManager A;
         parser P;
         A.Recv(buffer,&RecvBuf);
