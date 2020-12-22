@@ -13,15 +13,20 @@ void Delay(int time){
 int main() {
     char buffer[buffer_length];
     int connect_id=0;
-    //std::cout << "[+]Detecing file..." << std::endl;
+    bool RecvBuf = false;
+
+    fprintf(stdout,"Start Monitoring...\n");
+    Delay(1);
     for(int i=0;i<5;i++) {
         NetworkManager A;
         parser P;
-        A.Recv(buffer);
-        P.parse(buffer);
-        P.log();
+        A.Recv(buffer,&RecvBuf);
+        if(RecvBuf == true){
+            P.parse(buffer);
+            P.log();
+        }
     }
     //Delay(1); // unit second
-    std::cout<<"next."<<std::endl;
+    fprintf(stdout,"Exit.\n");
     return 0;
 }

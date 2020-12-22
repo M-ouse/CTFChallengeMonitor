@@ -23,14 +23,15 @@ private:
     int opt;
 public:
     NetworkManager();
-    void Recv(char* buffer);
+    void Recv(char* buffer,bool *RecvBuf);
     ~NetworkManager();
 };
 
 NetworkManager::NetworkManager() {
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd == -1) {
-        std::cout << "Error: socket" << std::endl;
+        perror("socket");
+
     }
     addr.sin_family = AF_INET;
     addr.sin_port = htons(listen_port);
@@ -40,20 +41,20 @@ NetworkManager::NetworkManager() {
         perror("setsockopt");
     }
     if (bind(listenfd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-        std::cout << "Error: bind" << std::endl;
+        perror("bind");
     }
     if(listen(listenfd, 5) == -1) {
-        std::cout << "Error: listen" << std::endl;
+        perror("listen");
     }
     clientAddrLen = sizeof(clientAddr);
     //std::cout<<"Initialize successfully"<<std::endl;
 }
 
-void NetworkManager::Recv(char * Dst) {
-    std::cout << "...listening" << std::endl;
+void NetworkManager::Recv(char * Dst,bool *RecvBuf) {
+    //std::cout << "...listening" << std::endl;
     conn = accept(listenfd, (struct sockaddr*)&clientAddr, &clientAddrLen);
     if (conn < 0) {
-        std::cout << "Error: accept" << std::endl;
+        perror("accept");
     }
     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, INET_ADDRSTRLEN);
     std::cout <<"[+] "<<GetTime()<< " connect " << clientIP << ":" << ntohs(clientAddr.sin_port) << std::endl;
@@ -65,6 +66,7 @@ void NetworkManager::Recv(char * Dst) {
             break;// in case of client close socket unexpectly
         }
         buf[len] = '\0';
+        *RecvBuf = true;
         if (strstr(buf, "#") != 0) {
             //std::cout << "...disconnect " << clientIP << ":" << ntohs(clientAddr.sin_port) << std::endl;
             //memcpy(Dst,buf,sizeof(buf));//assume that only receive message from your challenge once
@@ -81,7 +83,6 @@ void NetworkManager::Recv(char * Dst) {
 }
 
 NetworkManager::~NetworkManager() {
-    std::cout<<"connection finished."<<std::endl;
     close(conn);
     close(listenfd);
 }
