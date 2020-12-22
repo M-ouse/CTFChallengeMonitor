@@ -8,4 +8,6 @@ cmake .
 make
 ```
 
+## choose appropriate API for your challenge project in client folder
+
 Note : server will print log at the same folder in challenge.log
